@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Калькулятор імпорту: Роздріб vs Опт</title>
+  <meta name="theme-color" content="#0a84ff">
+  <link rel="manifest" href="/Calc/manifest.json">
+  <style>
+    :root{
+      --bg:#0b0c10; --card:#15171c; --ink:#e6e6e6; --muted:#a8b0bd; --accent:#0a84ff; --good:#1db954; --bad:#ff6b6b;
+      --border:#242832;
+    }
+    *{box-sizing:border-box;font-family:-apple-system,system-ui,Segoe UI,Roboto,Ubuntu,"Noto Sans",sans-serif}
+    html,body{margin:0;background:var(--bg);color:var(--ink)}
+    header{position:sticky;top:0;background:linear-gradient(180deg,#0b0c10 70%,#0b0c10cc);backdrop-filter:saturate(140%) blur(6px);z-index:5;border-bottom:1px solid var(--border)}
+    h1{font-size:1.1rem;margin:0;padding:16px 16px}
+    main{padding:12px 12px 80px;max-width:900px;margin:0 auto}
+    .grid{display:grid;gap:12px}
+    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .card h2{font-size:1rem;margin:0 0 10px 0;color:#fff}
+    label{display:block;font-size:.88rem;color:var(--muted);margin:6px 0 4px}
+    input[type="number"],input[type="text"]{
+      width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1116;color:var(--ink);
+      font-size:1rem;outline:none
+    }
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .muted{color:var(--muted);font-size:.9rem}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#0f1116;border:1px solid var(--border);font-size:.8rem;color:var(--muted)}
+    .totals{display:grid;gap:8px}
+    .total{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:12px;background:#0f1116;border:1px solid var(--border)}
+    .total strong{font-variant-numeric:tabular-nums;letter-spacing:.3px}
+    .ok{border-color:#1b3b22}
+    .bad{border-color:#3b1b1b}
+    footer{position:fixed;left:0;right:0;bottom:0;padding:10px;background:linear-gradient(0deg,#0b0c10 70%,transparent);border-top:1px solid var(--border)}
+    .bar{max-width:900px;margin:0 auto;display:flex;gap:8px}
+    button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--accent);color:#fff;font-weight:600;font-size:1rem}
+    button.secondary{background:#0f1116;color:var(--ink)}
+    .hint{margin-top:8px;color:var(--muted);font-size:.85rem}
+    .badge{display:inline-block;margin-left:6px;padding:3px 8px;border-radius:999px;background:#13263a;color:#79b8ff;font-size:.78rem;border:1px solid #1c3a57}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Калькулятор імпорту: Роздріб vs Опт <span class="badge" id="saveBadge">Збережено</span></h1>
+  </header>
+  <main>
+    <div class="grid">
+      <section class="card">
+        <div class="section-title"><h2>Товари</h2><span class="pill">Валюта: <span id="currencyLabel">USD</span></span></div>
+        <label>Товар 1 — назва</label>
+        <input id="item1_name" type="text" value="Інвертор">
+        <div class="row">
+          <div><label>Ціна роздріб (за од.)</label><input id="item1_price_retail" type="number" step="0.01" value="600"></div>
+          <div><label>Ціна опт (за од.)</label><input id="item1_price_wh" type="number" step="0.01" value="500"></div>
+        </div>
+        <div class="row">
+          <div><label>Кількість</label><input id="item1_qty" type="number" step="1" value="1"></div>
+          <div><label>Вага (кг)</label><input id="item1_wt" type="number" step="0.01" value="15"></div>
+        </div>
+        <hr style="border:0;border-top:1px solid var(--border);margin:12px 0">
+        <label>Товар 2 — назва</label>
+        <input id="item2_name" type="text" value="Акумулятор 48В 100А·год">
+        <div class="row">
+          <div><label>Ціна роздріб (за од.)</label><input id="item2_price_retail" type="number" step="0.01" value="900"></div>
+          <div><label>Ціна опт (за од.)</label><input id="item2_price_wh" type="number" step="0.01" value="750"></div>
+        </div>
+        <div class="row">
+          <div><label>Кількість</label><input id="item2_qty" type="number" step="1" value="1"></div>
+          <div><label>Вага (кг)</label><input id="item2_wt" type="number" step="0.01" value="45"></div>
+        </div>
+
+        <hr style="border:0;border-top:1px solid var(--border);margin:12px 0">
+        <details>
+          <summary class="muted">Додати 3-й товар (необов'язково)</summary>
+          <div class="row" style="margin-top:8px">
+            <div><label>Назва</label><input id="item3_name" type="text" value=""></div>
+            <div><label>Ціна роздріб</label><input id="item3_price_retail" type="number" step="0.01" value="0"></div>
+          </div>
+          <div class="row">
+            <div><label>Ціна опт</label><input id="item3_price_wh" type="number" step="0.01" value="0"></div>
+            <div><label>Кількість</label><input id="item3_qty" type="number" step="1" value="0"></div>
+          </div>
+          <div class="row">
+            <div><label>Вага (кг)</label><input id="item3_wt" type="number" step="0.01" value="0"></div>
+            <div></div>
+          </div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Податки та доставка</h2>
+        <div class="row">
+          <div><label>Роздріб: тариф доставки ($/кг)</label><input id="ret_ship_rate" type="number" step="0.01" value="8"></div>
+          <div><label>Роздріб: фікс. доплата</label><input id="ret_ship_flat" type="number" step="0.01" value="0"></div>
+        </div>
+        <div class="row">
+          <div><label>Роздріб: мито</label><input id="ret_duty" type="number" step="0.001" value="0.10"></div>
+          <div><label>Роздріб: ПДВ</label><input id="ret_vat" type="number" step="0.001" value="0.20"></div>
+        </div>
+
+        <hr style="border:0;border-top:1px solid var(--border);margin:12px 0">
+
+        <div class="row">
+          <div><label>Контейнер: загальна вартість</label><input id="cont_cost" type="number" step="0.01" value="4500"></div>
+          <div><label>Контейнер: завантаження (кг)</label><input id="cont_payload" type="number" step="1" value="10000"></div>
+        </div>
+        <div class="muted">Тариф контейнера ($/кг): <strong id="cont_rate">0.45</strong></div>
+
+        <div class="row" style="margin-top:8px">
+          <div><label>Опт: мито</label><input id="wh_duty" type="number" step="0.001" value="0.05"></div>
+          <div><label>Опт: ПДВ</label><input id="wh_vat" type="number" step="0.001" value="0.20"></div>
+        </div>
+        <div class="row">
+          <div><label>Опт: інші логістичні витрати/комплект</label><input id="wh_other" type="number" step="0.01" value="20"></div>
+          <div><label>Курс до UAH (необов'язково)</label><input id="fx" type="number" step="0.0001" value=""></div>
+        </div>
+        <div class="hint">Заповни курс, щоб бачити підсумки в гривні.</div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:12px">
+      <h2>Результати</h2>
+      <div class="totals" id="totals"></div>
+      <div class="hint">Формули: CIF = товар + доставка; Мито = CIF × ставка; ПДВ = (CIF + Мито) × ставка.</div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="bar">
+      <button id="installBtn" class="secondary" type="button">Встановити як додаток</button>
+      <button id="resetBtn" type="button">Скинути</button>
+      <button id="shareBtn" type="button">Експорт</button>
+    </div>
+  </footer>
+
+<script>
+(function(){
+  const els = {
+    currencyLabel: document.getElementById('currencyLabel'),
+    contRate: document.getElementById('cont_rate'),
+    totals: document.getElementById('totals'),
+    saveBadge: document.getElementById('saveBadge'),
+    installBtn: document.getElementById('installBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    shareBtn: document.getElementById('shareBtn'),
+  };
+  const fields = [
+    'item1_name','item1_price_retail','item1_price_wh','item1_qty','item1_wt',
+    'item2_name','item2_price_retail','item2_price_wh','item2_qty','item2_wt',
+    'item3_name','item3_price_retail','item3_price_wh','item3_qty','item3_wt',
+    'ret_ship_rate','ret_ship_flat','ret_duty','ret_vat',
+    'cont_cost','cont_payload','wh_duty','wh_vat','wh_other','fx'
+  ];
+
+  function getVal(id){ const el=document.getElementById(id); return el.type==='number' ? parseFloat(el.value||0) : el.value; }
+  function setVal(id,v){ document.getElementById(id).value = v; }
+  function save(){
+    const data={};
+    fields.forEach(f=>data[f]=document.getElementById(f).value);
+    localStorage.setItem('uaImportCalc', JSON.stringify(data));
+    els.saveBadge.textContent='Збережено';
+    setTimeout(()=>els.saveBadge.textContent='Збережено', 1500);
+  }
+  function load(){
+    const raw=localStorage.getItem('uaImportCalc');
+    if(!raw) return;
+    try{
+      const data=JSON.parse(raw);
+      fields.forEach(f=>{ if(data[f]!==undefined) setVal(f,data[f]); });
+    }catch(e){ console.warn(e); }
+  }
+
+  function fmt(n){ return n.toLocaleString('uk-UA',{maximumFractionDigits:2}); }
+  function compute(){
+    const items=[
+      {pr:getVal('item1_price_retail'), pw:getVal('item1_price_wh'), q:getVal('item1_qty'), w:getVal('item1_wt')},
+      {pr:getVal('item2_price_retail'), pw:getVal('item2_price_wh'), q:getVal('item2_qty'), w:getVal('item2_wt')},
+      {pr:getVal('item3_price_retail'), pw:getVal('item3_price_wh'), q:getVal('item3_qty'), w:getVal('item3_wt')},
+    ];
+    const retailGoods = items.reduce((s,x)=>s + x.pr*x.q, 0);
+    const wholesaleGoods = items.reduce((s,x)=>s + x.pw*x.q, 0);
+    const totalWeight = items.reduce((s,x)=>s + x.w*x.q, 0);
+
+    const retShip = getVal('ret_ship_rate')*totalWeight + getVal('ret_ship_flat');
+    const CIFret = retailGoods + retShip;
+    const dutyRet = CIFret * getVal('ret_duty');
+    const vatRet = (CIFret + dutyRet) * getVal('ret_vat');
+    const allInRet = CIFret + dutyRet + vatRet;
+
+    const contRate = (getVal('cont_cost')/Math.max(1,getVal('cont_payload'))) || 0;
+    els.contRate.textContent = fmt(contRate);
+    const whShip = contRate*totalWeight + getVal('wh_other');
+    const CIFwh = wholesaleGoods + whShip;
+    const dutyWh = CIFwh * getVal('wh_duty');
+    const vatWh = (CIFwh + dutyWh) * getVal('wh_vat');
+    const allInWh = CIFwh + dutyWh + vatWh;
+
+    const fx = getVal('fx')||null;
+    const inUAH = fx ? ` • ₴ ${fmt(allInRet*fx)} vs ₴ ${fmt(allInWh*fx)}` : '';
+
+    els.totals.innerHTML = `
+      <div class="total bad"><span>Роздрібне ввезення (1 комплект)</span><strong>$ ${fmt(allInRet)}${fx?` / ₴ ${fmt(allInRet*fx)}`:''}</strong></div>
+      <div class="total ok"><span>Опт (контейнер) — за комплект</span><strong>$ ${fmt(allInWh)}${fx?` / ₴ ${fmt(allInWh*fx)}`:''}</strong></div>
+      <div class="total"><span>Різниця (економія при опті)</span><strong>$ ${fmt(allInRet-allInWh)}${fx?` / ₴ ${fmt((allInRet-allInWh)*fx)}`:''}</strong></div>
+      <div class="muted">Проміжні суми: CIF роздріб $ ${fmt(CIFret)}, мито $ ${fmt(dutyRet)}, ПДВ $ ${fmt(vatRet)}<br>
+      CIF опт $ ${fmt(CIFwh)}, мито $ ${fmt(dutyWh)}, ПДВ $ ${fmt(vatWh)}${inUAH}</div>
+    `;
+  }
+
+  // Event listeners
+  fields.forEach(id => {
+    const el=document.getElementById(id);
+    el.addEventListener('input', ()=>{ save(); compute(); });
+  });
+
+  // Share/Export
+  els.shareBtn.addEventListener('click', async ()=>{
+    const data={};
+    fields.forEach(f=>data[f]=document.getElementById(f).value);
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const file=new File([blob],'ua_import_calc.json',{type:'application/json'});
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({title:'Експорт калькулятора', files:[file]});
+    }else{
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ua_import_calc.json'; a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  });
+
+  // Reset
+  els.resetBtn.addEventListener('click', ()=>{
+    localStorage.removeItem('uaImportCalc');
+    location.reload();
+  });
+
+  // Install prompt (PWA)
+  let deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault(); deferredPrompt=e; els.installBtn.disabled=false;
+  });
+  els.installBtn.addEventListener('click', async()=>{
+    if(!deferredPrompt){ alert('Щоб встановити: Поділитися → Додати на Початковий екран (iOS)'); return; }
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt=null;
+  });
+
+  // Load and compute
+  load(); compute();
+
+  // Register SW
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('/Calc/sw.js');
+    });
+  }
+})();
+</script>
+</body>
+</html>
