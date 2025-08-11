@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="uk">
-<head>: <link rel="manifest" href="/Calc/manifest.json">
+<head>
   <meta charset="utf-8">
-  <meta name="theme-color" content="#2196f3">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Калькулятор імпорту: Роздріб vs Опт</title>
   <meta name="theme-color" content="#0a84ff">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/Calc/manifest.json">
   <style>
     :root{
       --bg:#0b0c10; --card:#15171c; --ink:#e6e6e6; --muted:#a8b0bd; --accent:#0a84ff; --good:#1db954; --bad:#ff6b6b;
@@ -254,7 +254,7 @@
   // Register SW
   if('serviceWorker' in navigator){
     window.addEventListener('load', ()=>{
-      navigator.serviceWorker.register('sw.js');
+      navigator.serviceWorker.register('/Calc/sw.js');
     });
   }
 })();
